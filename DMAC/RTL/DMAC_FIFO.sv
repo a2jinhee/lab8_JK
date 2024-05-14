@@ -17,7 +17,7 @@ module DMAC_FIFO #(
 
     localparam  FIFO_DEPTH              = (1<<DEPTH_LG2);
 
-    reg     [DATA_WIDTH-1:0]            data[FIFO_DEPTH];
+    reg     [DATA_WIDTH-1:0]            data[FIFO_DEPTH],   rdata,  rdata_n;
 
     reg                                 full,       full_n,
                                         empty,      empty_n;
@@ -29,7 +29,7 @@ module DMAC_FIFO #(
         if (!rst_n) begin
             full                        <= 1'b0;
             empty                       <= 1'b1;    // empty after as reset
-
+            rdata                       <= {DATA_WIDTH{1'b0}};
             wrptr                       <= {(DEPTH_LG2+1){1'b0}};
             rdptr                       <= {(DEPTH_LG2+1){1'b0}};
 
@@ -40,7 +40,7 @@ module DMAC_FIFO #(
         else begin
             full                        <= full_n;
             empty                       <= empty_n;
-
+            rdata                       <= rdata_n;
             wrptr                       <= wrptr_n;
             rdptr                       <= rdptr_n;
 
@@ -50,25 +50,23 @@ module DMAC_FIFO #(
         end
 
     always_comb begin
-        // wrptr_n                     = wrptr;
-        // rdptr_n                     = rdptr;
+        wrptr_n                     = wrptr;
+        rdptr_n                     = rdptr;
+        rdata_n                     = rdata;
+        if (wren_i & ~full) begin
+            wrptr_n                     = wrptr + 'd1;
+            if(empty)begin  
+                rdata_n                     = wdata_i;
+            end
+        end
 
-        // if (wren_i & ~full) begin
-        //     wrptr_n                     = wrptr + 'd1;
-        // end
-
-        // if (rden_i & ~empty) begin
-        //     rdptr_n                     = rdptr + 'd1;
-        // end
-
-        // empty_n                     = (wrptr_n == rdptr_n);
-        // full_n                      = (wrptr_n[DEPTH_LG2]!=rdptr_n[DEPTH_LG2])
-        //                              &(wrptr_n[DEPTH_LG2-1:0]==rdptr_n[DEPTH_LG2-1:0]);
-
-        wrptr_n = wren_i & ~full ? wrptr + 'd1 : wrptr;
-        rdptr_n = rden_i & ~empty ? rdptr + 'd1 : rdptr;
-        full_n = (wrptr_n[DEPTH_LG2] != rdptr_n[DEPTH_LG2]) & (wrptr_n[DEPTH_LG2-1:0] == rdptr_n[DEPTH_LG2-1:0]);
-        empty_n = (wrptr_n == rdptr_n);
+        if (rden_i & ~empty) begin
+            rdptr_n                     = rdptr + 'd1;
+            rdata_n                     = data[rdptr_n[DEPTH_LG2-1:0]];
+        end
+        empty_n                     = (wrptr_n == rdptr_n);
+        full_n                      = (wrptr_n[DEPTH_LG2]!=rdptr_n[DEPTH_LG2])
+                                     &(wrptr_n[DEPTH_LG2-1:0]==rdptr_n[DEPTH_LG2-1:0]);
 
     end
 
@@ -92,6 +90,6 @@ module DMAC_FIFO #(
 
     assign  full_o                      = full;
     assign  empty_o                     = empty;
-    assign  rdata_o                     = data[rdptr[DEPTH_LG2-1:0]];
+    assign  rdata_o                     = rdata; // data[rdptr[DEPTH_LG2-1:0]];
 
 endmodule
