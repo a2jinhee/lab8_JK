@@ -65,10 +65,10 @@ module DMAC_FIFO #(
         // full_n                      = (wrptr_n[DEPTH_LG2]!=rdptr_n[DEPTH_LG2])
         //                              &(wrptr_n[DEPTH_LG2-1:0]==rdptr_n[DEPTH_LG2-1:0]);
 
-        full_n = (wrptr_n[DEPTH_LG2] != rdptr_n[DEPTH_LG2]) & (wrptr_n[DEPTH_LG2-1:0] == rdptr_n[DEPTH_LG2-1:0]);
-        empty_n = (wrptr_n == rdptr_n);
         wrptr_n = wren_i & ~full ? wrptr + 'd1 : wrptr;
         rdptr_n = rden_i & ~empty ? rdptr + 'd1 : rdptr;
+        full_n = (wrptr_n[DEPTH_LG2] != rdptr_n[DEPTH_LG2]) & (wrptr_n[DEPTH_LG2-1:0] == rdptr_n[DEPTH_LG2-1:0]);
+        empty_n = (wrptr_n == rdptr_n);
 
     end
 
