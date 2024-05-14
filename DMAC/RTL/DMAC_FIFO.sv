@@ -57,7 +57,7 @@ module DMAC_FIFO #(
         if (wren_i & ~full) begin
             wrptr_n                     = wrptr + 'd1;
 
-            if empty begin
+            if (empty) begin
                 newreg_n                 = wdata_i;
             end
         end
