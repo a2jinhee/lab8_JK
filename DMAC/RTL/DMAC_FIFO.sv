@@ -50,20 +50,25 @@ module DMAC_FIFO #(
         end
 
     always_comb begin
-        wrptr_n                     = wrptr;
-        rdptr_n                     = rdptr;
+        // wrptr_n                     = wrptr;
+        // rdptr_n                     = rdptr;
 
-        if (wren_i & ~full) begin
-            wrptr_n                     = wrptr + 'd1;
-        end
+        // if (wren_i & ~full) begin
+        //     wrptr_n                     = wrptr + 'd1;
+        // end
 
-        if (rden_i & ~empty) begin
-            rdptr_n                     = rdptr + 'd1;
-        end
+        // if (rden_i & ~empty) begin
+        //     rdptr_n                     = rdptr + 'd1;
+        // end
 
-        empty_n                     = (wrptr_n == rdptr_n);
-        full_n                      = (wrptr_n[DEPTH_LG2]!=rdptr_n[DEPTH_LG2])
-                                     &(wrptr_n[DEPTH_LG2-1:0]==rdptr_n[DEPTH_LG2-1:0]);
+        // empty_n                     = (wrptr_n == rdptr_n);
+        // full_n                      = (wrptr_n[DEPTH_LG2]!=rdptr_n[DEPTH_LG2])
+        //                              &(wrptr_n[DEPTH_LG2-1:0]==rdptr_n[DEPTH_LG2-1:0]);
+
+        full_n = (wrptr_n[DEPTH_LG2] != rdptr_n[DEPTH_LG2]) & (wrptr_n[DEPTH_LG2-1:0] == rdptr_n[DEPTH_LG2-1:0]);
+        empty_n = (wrptr_n == rdptr_n);
+        wrptr_n = wren_i & ~full ? wrptr + 'd1 : wrptr;
+        rdptr_n = rden_i & ~empty ? rdptr + 'd1 : rdptr;
 
     end
 
