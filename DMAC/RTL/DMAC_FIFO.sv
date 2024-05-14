@@ -55,9 +55,6 @@ module DMAC_FIFO #(
         rdata_n                     = rdata;
         if (wren_i & ~full) begin
             wrptr_n                     = wrptr + 'd1;
-            if(empty)begin  
-                rdata_n                     = wdata_i;
-            end
         end
 
         if (rden_i & ~empty) begin
