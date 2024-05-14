@@ -40,7 +40,7 @@ module DMAC_FIFO #(
         else begin
             full                        <= full_n;
             empty                       <= empty_n;
-            newreg                       <= newreg_n;
+            newreg                      <= newreg_n;
             wrptr                       <= wrptr_n;
             rdptr                       <= rdptr_n;
 
@@ -64,7 +64,7 @@ module DMAC_FIFO #(
 
         if (rden_i & ~empty) begin
             rdptr_n                     = rdptr + 'd1;
-            newreg_n                    = data[rdptr[DEPTH_LG2-1:0]];
+            newreg_n                    = data[rdptr_n[DEPTH_LG2-1:0]];
         end
 
         empty_n                     = (wrptr_n == rdptr_n);
